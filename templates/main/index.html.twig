@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block main %}
+    {{ dump(data) }}
+    {% for key,value in data %}
+        <p><a href="{{ key }}">{{ value }}</a></p>
+    {% endfor %}
+{% endblock %}
