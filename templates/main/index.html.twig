@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block main %}
+    <h1>{{ message }}</h1>
     {{ dump(data) }}
     {% for key,value in data %}
         <p><a href="{{ key }}">{{ value }}</a></p>
