@@ -10,7 +10,16 @@ class ArticleFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $arr = [
+        foreach (self::getData() as $article) {
+            $manager->persist($article);
+        }
+
+        $manager->flush();
+    }
+
+    public static function getData(): array
+    {
+        return [
             Article::create(null, null, 'First Article', 'This is the content of the first article.', 0.02),
             Article::create(null, 'Jane Smith', 'Second Article', 'This is the content of the second article.', 15.75),
             Article::create(null, 'Emily Johnson', 'Third Article', 'This is the content of the third article.', 12.30),
@@ -22,12 +31,5 @@ class ArticleFixtures extends Fixture
             Article::create(null, 'Daniel White', 'Ninth Article', 'This is the content of the ninth article.', 9.75),
             Article::create(null, 'Laura Harris', 'Tenth Article', 'This is the content of the tenth article.', 16.40),
         ];
-
-        foreach ($arr as $article) {
-            $manager->persist($article);
-        }
-
-        $manager->flush();
     }
-
 }

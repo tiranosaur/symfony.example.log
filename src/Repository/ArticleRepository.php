@@ -91,4 +91,15 @@ class ArticleRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
+
+    public function truncate(): void
+    {
+        $tableName = 'article';
+        $connection = $this->getEntityManager()->getConnection();
+        $platform = $connection->getDatabasePlatform();
+
+        $connection->executeStatement('SET FOREIGN_KEY_CHECKS=0;');
+        $connection->executeStatement($platform->getTruncateTableSQL($tableName, true /* whether to reset auto-increment */));
+        $connection->executeStatement('SET FOREIGN_KEY_CHECKS=1;');
+    }
 }

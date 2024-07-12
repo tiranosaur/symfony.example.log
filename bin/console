@@ -4,6 +4,11 @@
 use App\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
+set_error_handler(function ($errno, $errstr) {
+    return
+        strpos($errstr, 'ini_set()') === 0;
+}, E_DEPRECATED);
+
 if (!is_dir(dirname(__DIR__).'/vendor')) {
     throw new LogicException('Dependencies are missing. Try running "composer install".');
 }
