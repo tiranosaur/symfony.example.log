@@ -1,0 +1,179 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block main %}
+    <style>
+        th, td {
+            border: 1px solid black;
+            padding: 5px 15px;
+        }
+
+        table {
+            border-spacing: unset;
+        }
+    </style>
+    <table id="article-table">
+        <tr id="article-table-head">
+            <th>id</th>
+            <th>author</th>
+            <th>title</th>
+            <th>content</th>
+            <th>price</th>
+            <th>action</th>
+        </tr>
+    </table>
+
+    <div id="article-form">
+        <p>
+            <label for="article-form-id">Id</label>
+            <input type="text" id="article-form-id" name="article-form-id" disabled>
+        </p>
+        <p>
+            <label for="article-form-author">author</label>
+            <input type="text" id="article-form-author" name="article-form-author">
+        </p>
+        <p>
+            <label for="article-form-title">title</label>
+            <input type="text" id="article-form-title" name="article-form-title">
+        </p>
+        <p>
+            <label for="article-form-content">contetn</label>
+            <input type="text" id="article-form-content" name="article-form-content">
+        </p>
+        <p>
+            <label for="article-form-price">price</label>
+            <input type="number" id="article-form-price" name="article-form-price">
+        </p>
+        <button onclick="updateArticle()">Update</button>
+        <button onclick="createArticle()">Create</button>
+    </div>
+
+    <script>
+        const tableBody = document.getElementById('article-table-head');
+        const articleForm = document.getElementById('article-form');
+        const articleFormId = document.getElementById('article-form-id');
+        const articleFormAuthor = document.getElementById('article-form-author');
+        const articleFormTitle = document.getElementById('article-form-title');
+        const articleFormContent = document.getElementById('article-form-content');
+        const articleFormPrice = document.getElementById('article-form-price');
+
+
+        function readArticle(id) {
+            console.log('readArticle ' + id);
+            fetch(`{{ url('article_index') }}/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    articleFormId.value = data.id;
+                    articleFormAuthor.value = data.author;
+                    articleFormTitle.value = data.title;
+                    articleFormContent.value = data.content;
+                    articleFormPrice.value = data.price;
+                })
+                .catch(e => {
+                    console.error('Error read article:', e);
+                });
+        }
+
+        function createArticle() {
+            console.log('createArticle');
+            fetch('{{ url('article_create') }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json',},
+                body: JSON.stringify(getData())
+            })
+                .then(res => {
+                    fillTable();
+                    clearData();
+                })
+                .catch(e => {
+                    console.log("error")
+                })
+        }
+
+        function updateArticle() {
+            console.log('updateArticle ');
+            fetch('{{ url('article_index') }}/' + articleFormId.value, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json',},
+                body: JSON.stringify(getData())
+            })
+                .then(res => {
+                    fillTable();
+                    clearData();
+                })
+                .catch(e => {
+                    console.log("error")
+                })
+        }
+
+        function deleteArticle(id) {
+            console.log('deleteArticle ' + id);
+            fetch('{{ url('article_index') }}/' + id, {
+                method: 'DELETE',
+            })
+                .then(res => {
+                    fillTable();
+                    clearData();
+                })
+                .catch(e => {
+                    console.log("error")
+                })
+        }
+
+
+        function getData() {
+            return {
+                'id': articleFormId.value,
+                'author': articleFormAuthor.value,
+                'title': articleFormTitle.value,
+                'content': articleFormContent.value,
+                'price': articleFormPrice.value,
+            };
+        }
+
+        function clearData() {
+            articleFormId.value = ''
+            articleFormAuthor.value = ''
+            articleFormTitle.value = ''
+            articleFormContent.value = ''
+            articleFormPrice.value = ''
+        }
+
+        function fillTable() {
+            fetch('{{ path('article_list') }}')
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    document.querySelectorAll('.tr-article').forEach(x => x.remove())
+                    data.forEach(article => {
+                        const row = document.createElement('tr');
+                        row.classList.add('tr-article');
+                        row.innerHTML = `
+                            <td>${article.id}</td>
+                            <td>${article.author}</td>
+                            <td>${article.title}</td>
+                            <td>${article.content}</td>
+                            <td>${article.price}</td>
+                            <td>
+                                <button onclick="readArticle(${article.id})">Info</button>
+                                <button onclick="deleteArticle(${article.id})">Delete</button>
+                            </td>
+                        `;
+                        tableBody.after(row);
+                    });
+                })
+                .catch(e => {
+                    console.error('Error fetching articles:', e);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fillTable();
+        });
+    </script>
+{% endblock %}
+

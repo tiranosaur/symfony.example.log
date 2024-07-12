@@ -14,3 +14,11 @@ php bin/console doctrine:database:create
 php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 ```
+
+2. Create article 
+3. 
+3. fill fixtures
+```text
+php bin/console doctrine:fixtures:load
+php bin/console doctrine:fixtures:load --group=ArticleFixtures
+```
