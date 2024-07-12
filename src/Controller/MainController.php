@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Controller;
 
@@ -14,6 +14,7 @@ class MainController extends AbstractController
         return $this->render('main/index.html.twig', [
             'title' => 'Main Page',
             'data' => [
+                $this->generateUrl('app_validation_fail') => 'Validation Unsuccessful',
             ]
         ]);
     }
