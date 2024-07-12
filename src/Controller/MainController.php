@@ -14,6 +14,8 @@ class MainController extends AbstractController
         return $this->render('main/index.html.twig', [
             'title' => 'Main Page',
             'data' => [
+                $this->generateUrl('app_form_controller') => 'создание формы в контроллере',
+                $this->generateUrl('app_form_class') => 'создание формы в классе'
             ]
         ]);
     }
