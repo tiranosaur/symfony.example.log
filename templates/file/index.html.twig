@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block main %}
+    <style>
+        th, td {
+            border: 1px solid black;
+            padding: 5px 15px;
+        }
+
+        table {
+            border-spacing: unset;
+        }
+    </style>
+    <table>
+        <tr>
+            <th>id</th>
+            <th>filename</th>
+            <th>action</th>
+        </tr>
+        {% for key, value in fileList %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ value }}</td>
+                <td>
+                    <button onclick="remove('{{ value }}')">DELETE</button>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <script>
+        function remove(filename) {
+            console.log('delete ' + filename)
+            fetch('{{ url('app_file_delete') }}', {
+                method: 'delete',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({'filename': filename})
+            }).then(res => {
+                console.log(res)
+                window.location.href = '{{ url('app_file_index') }}'
+            }).catch(err => {
+                console.error('There was a problem with the fetch operation:', err);
+            });
+        }
+    </script>
+    {{ form(fileUploadForm) }}
+{% endblock %}

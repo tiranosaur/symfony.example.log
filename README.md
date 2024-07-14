@@ -14,3 +14,12 @@ php bin/console doctrine:database:create
 php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 ```
+
+2. filesystem
+
+UPLOAD_DIR in .env
+
+```text
+composer require symfony/filesystem
+composer require symfony/finder
+```

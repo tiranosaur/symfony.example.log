@@ -14,6 +14,7 @@ class MainController extends AbstractController
         return $this->render('main/index.html.twig', [
             'title' => 'Main Page',
             'data' => [
+                $this->generateUrl('app_file_index') => 'Files'
             ]
         ]);
     }
