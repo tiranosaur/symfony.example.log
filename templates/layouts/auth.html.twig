@@ -1,0 +1,35 @@
+{% block auth %}
+    <div>
+        {% if app.user %}
+            <p>{{ message ?? 'HI' }} {{ app.user.username }}</p>
+            <button onclick="window.location.href='/logout'">Sign Out</button>
+        {% else %}
+            <p>{{ message ?? 'HI' }} annon!!!</p>
+            <button onclick="window.location.href='/login'">Sign In</button>
+            <button onclick="window.location.href='/register'">Sign Up</button>
+        {% endif %}
+    </div>
+    <div>
+        {% if is_granted('PUBLIC_ACCESS') -%}
+            <div> # You're `PUBLIC_ACCESS`</div>
+        {% endif %}
+        {% if is_granted('ROLE_SUPER_ADMIN') -%}
+            <div> # You're `ROLE_SUPER_ADMIN`</div>
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN') -%}
+            <div> # You're `ROLE_ADMIN`</div>
+        {% endif %}
+        {% if is_granted('ROLE_USER') -%}
+            <div> # You're `ROLE_USER`</div>
+        {% endif %}
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            <div> # This user entered their credentials THIS session</div>
+        {% endif %}
+        {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+            <div> # User logged in via a cookie (ie: Auth again before doing sensitive things)</div>
+        {% endif %}
+        {% if is_granted('IS_AUTHENTICATED_ANONYMOUSLY') %}
+            <div> # This is a `guest` or anonymous user</div>
+        {% endif %}
+    </div>
+{% endblock %}
