@@ -3,14 +3,18 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Util\UserRoleUtil;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -20,14 +24,64 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     private ?string $username = null;
 
-    #[ORM\Column]
-    private array $roles = [];
-
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\ManyToMany(targetEntity: Role::class, mappedBy: 'users')]
+    private Collection $roles;
+
+    function __construct()
+    {
+        $this->roles = new ArrayCollection();
+    }
+
+    public function getRoles(): array
+    {
+        $roles = [];
+        foreach ($this->roles->toArray() as $item) {
+            $roles[] = $item->getName();
+        }
+
+        UserRoleUtil::adminHandlig($roles);
+
+        return array_unique($roles);
+    }
+
+
+    public function addRole(Role $role): User
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles[] = $role;
+            $role->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public static function create(int|null $id, string $username, string $password): self
+    {
+        $entity = new self();
+        $entity->id = $id;
+        $entity->setUsername($username);
+        $entity->setPassword(password_hash($password, PASSWORD_BCRYPT));
+        return $entity;
+    }
+
+    public function jsonSerialize(): array
+    {
+        $arr = [
+            'id' => $this->id,
+            'name' => $this->username,
+            'roles' => [],
+        ];
+//        foreach ($this->roles as $role) {
+//            $arr['roles'][] = $role->getName();
+//        }
+        return $arr;
+    }
 
     public function getId(): ?int
     {
@@ -53,31 +107,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        return (string)$this->username;
     }
 
-    /**
-     * @see UserInterface
-     */
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): static
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): string
     {
         return $this->password;

@@ -17,6 +17,7 @@ class MainController extends AbstractController
                 $this->generateUrl('app_user_register') => 'registration',
                 $this->generateUrl('app_main_home') => 'home',
                 $this->generateUrl('app_main_hello') => 'hello',
+                $this->generateUrl('app_main_super') => 'super',
             ]
         ]);
     }
@@ -37,6 +38,17 @@ class MainController extends AbstractController
     {
         return $this->render('main/hello.html.twig', [
             'title' => 'HELLO page',
+            'data' => [
+
+            ]
+        ]);
+    }
+
+    #[Route('/super', name: 'app_main_super')]
+    public function super(): Response
+    {
+        return $this->render('main/super.html.twig', [
+            'title' => 'SUPER page',
             'data' => [
 
             ]
